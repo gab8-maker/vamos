@@ -1,7 +1,7 @@
 import { execFile } from "child_process"
 import fs from 'fs';
 
-execFile('./yt-dlp.exe', ["-x", "https://www.youtube.com/watch?v=2aSJCWtSIiw", "--audio-format", " mp3", "--audio-quality", " 320k"], async (err, stdout) => {
+execFile('./yt-dlp', ["-x", "https://www.youtube.com/watch?v=2aSJCWtSIiw", "--audio-format", " mp3", "--audio-quality", " 320k"], async (err, stdout) => {
     if (err) {
         console.error("Erro", err.message);
         return;
@@ -27,5 +27,6 @@ const findFile = () => {
         console.log('Arquivos encontrados:', arquivosEncontrados);
     });
 }
+
 
 
