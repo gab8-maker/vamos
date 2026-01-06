@@ -1,7 +1,7 @@
 import { execFile } from "child_process"
 import fs from 'fs';
 
-const { spawn } = require("child_process");
+import { spawn } from "child_process";
 
 /**
  * Executa um comando Linux genérico
@@ -78,6 +78,7 @@ const findFile = () => {
         console.log('Arquivos encontrados:', arquivosEncontrados);
     });
 }
+
 
 
 
