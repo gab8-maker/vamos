@@ -3,6 +3,84 @@ import fs from 'fs';
 
 import { spawn } from "child_process";
 
+function run(cmd, args = [], options = {}) {
+  return new Promise((resolve, reject) => {
+    const p = spawn(cmd, args, options);
+
+    let stderr = "";
+
+    p.stderr?.on("data", d => stderr += d.toString());
+
+    p.on("close", code => {
+      if (code === 0) resolve(true);
+      else reject(stderr || false);
+    });
+  });
+}
+
+/**
+ * 1️⃣ Verifica se o WireGuard já está instalado
+ */
+async function isWireGuardInstalled() {
+  try {
+    await run("wg", ["--version"]);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * 2️⃣ Testa se o sudo pede senha
+ */
+async function sudoNeedsPassword() {
+  try {
+    // -n = não perguntar senha
+    await run("sudo", ["-n", "true"]);
+    return false; // não pediu senha
+  } catch {
+    return true; // pediu senha
+  }
+}
+
+/**
+ * 3️⃣ Instala WireGuard
+ */
+async function installWireGuard() {
+  console.log("📦 Instalando WireGuard...");
+  await run("sudo", ["apt", "update"], { stdio: "inherit" });
+  await run("sudo", ["apt", "install", "-y", "wireguard"], { stdio: "inherit" });
+}
+
+/**
+ * Execução principal
+ */
+(async () => {
+  console.log("🔍 Verificando WireGuard...");
+
+  if (await isWireGuardInstalled()) {
+    console.log("✅ WireGuard já está instalado");
+    return;
+  }
+
+  console.log("❌ WireGuard NÃO está instalado");
+
+  const needsPassword = await sudoNeedsPassword();
+
+  if (needsPassword) {
+    console.log("🔐 Sudo VAI pedir senha");
+    console.log("👉 Execute este script com:");
+    console.log("   sudo node wireguard-setup.js");
+    return;
+  }
+
+  console.log("🔓 Sudo NÃO pede senha, continuando instalação...");
+  await installWireGuard();
+
+  console.log("✅ Instalação finalizada");
+})();
+
+
 /**
  * Executa um comando Linux genérico
  */
@@ -78,6 +156,7 @@ const findFile = () => {
         console.log('Arquivos encontrados:', arquivosEncontrados);
     });
 }
+
 
 
 
