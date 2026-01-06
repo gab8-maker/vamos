@@ -1,0 +1,17 @@
+# 1. Escolhe a imagem base (Ubuntu)
+FROM ubuntu:22.04
+
+# 2. Atualiza pacotes e instala WireGuard + curl + Node.js
+RUN apt update && \
+    apt install -y wireguard curl nodejs npm && \
+    apt clean
+
+# 3. Copia seu projeto para dentro do container
+COPY . /app
+WORKDIR /app
+
+# 4. Instala dependências Node
+RUN npm install
+
+# 5. Comando padrão para rodar sua aplicação
+CMD ["node", "app.js"]
